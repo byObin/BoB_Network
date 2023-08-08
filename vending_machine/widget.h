@@ -21,6 +21,8 @@ public:
 
     void changeMoney(int diff);
     void disactivateDrinkButton(int diff);
+    // Declare calculateChange function
+    std::tuple<int, int, int, int> calculateChange(int amount);
 
 private slots:
     void on_pb10_clicked();
@@ -29,13 +31,13 @@ private slots:
 
     void on_pb100_clicked();
 
+    void on_pb500_clicked();
+
     void on_pbCoffee_clicked();
 
     void on_pbTea_clicked();
 
     void on_pbMilk_clicked();
-
-    void on_pb500_clicked();
 
     void on_pbRst_clicked();
 

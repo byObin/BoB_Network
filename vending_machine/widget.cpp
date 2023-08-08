@@ -66,7 +66,6 @@ void Widget::on_pbCoffee_clicked(){
     }
 }
 
-
 void Widget::on_pbTea_clicked(){
     changeMoney(-150);
 }
@@ -76,7 +75,44 @@ void Widget::on_pbMilk_clicked(){
     changeMoney(-200);
 }
 
-void Widget::on_pbRst_clicked(){
-    QMessageBox mb;
-    mb.information(nullptr, "Title", "Text");
+// Function to calculate the number of coins to return based on the money
+std::tuple<int, int, int, int> Widget::calculateChange(int amount)
+{
+    int num500 = amount / 500;
+    amount %= 500;
+
+    int num100 = amount / 100;
+    amount %= 100;
+
+    int num50 = amount / 50;
+    amount %= 50;
+
+    int num10 = amount / 10;
+
+    return std::make_tuple(num500, num100, num50, num10);
 }
+
+void Widget::on_pbRst_clicked(){
+  if (money > 0) {
+        std::tuple<int, int, int, int> changeCoins = calculateChange(money);
+
+        int num500 = std::get<0>(changeCoins);
+        int num100 = std::get<1>(changeCoins);
+        int num50 = std::get<2>(changeCoins);
+        int num10 = std::get<3>(changeCoins);
+
+        QString message = "Change breakdown:\n";
+        message += QString("500원: %1 개\n").arg(num500);
+        message += QString("100원: %1 개\n").arg(num100);
+        message += QString("50원: %1 개\n").arg(num50);
+        message += QString("10원: %1 개").arg(num10);
+
+        QMessageBox::information(this, "Change Details", message);
+
+        money = 0;
+        ui->lcdNumber->display(money);
+    }
+
+}
+
+
