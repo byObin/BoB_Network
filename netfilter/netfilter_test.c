@@ -69,6 +69,7 @@ static uint32_t print_pkt (struct nfq_data *tb)
 	if (nfq_get_gid(tb, &gid))
 		printf("gid=%u ", gid);
 
+	//Netfilter 대기열에서 처리 중인 네트워크 패킷에서 정보를 추출
 	ret = nfq_get_secctx(tb, &secdata);
 	if (ret > 0)
 		printf("secctx=\"%.*s\" ", ret, secdata);
@@ -77,27 +78,29 @@ static uint32_t print_pkt (struct nfq_data *tb)
 	
 	//////////
 	
-	if (ret >= 0)
+	if (ret >= 0)	//check the length of payload is longer than 0
     	{
         	printf("payload_len=%d ", ret);
 	 // parse ip header 
 	struct iphdr *ip_header = (struct iphdr *)data;
         if (ip_header->protocol == IPPROTO_TCP)	//if IP protocol == TCP
-        {//parse TCP header
+        {   //parse TCP header
             struct tcphdr *tcp_header = (struct tcphdr *)(data + ip_header->ihl * 4);
             int src_port = ntohs(tcp_header->source);
             int dest_port = ntohs(tcp_header->dest);
 
-            // print if port =/= 443
+            // print if port =/= 443(https)
             if (src_port != 443 && dest_port != 443)
             {	// extract and print Host header from HTTP Request
                 char *http_data = (char *)(data + ip_header->ihl * 4 + tcp_header->doff * 4);
 
                 // find Host header from HTTP Request
+		    // strstr: search for a 'Host: ' and move the pointer right after the word
                 char *host_header = strstr(http_data, "Host: ");
                 if (host_header)
                 {
                     host_header += 6; // start after "Host: " 
+			// strchr: search for a single character (in this case, '\r')
                     char *end_of_host = strchr(host_header, '\r');
                     if (end_of_host)
                     {
